@@ -36,12 +36,12 @@ app.use(session({
     mongoUrl: process.env.MONGODB_URI,
     touchAfter: 24 * 3600
   }),
-  cookie: {
+    cookie: {
     httpOnly: true,
-    secure: true, // Always true for production cross-origin
-    sameSite: "None", // Required for cross-origin
+    secure: false, // Set to false for HTTP
+    sameSite: "Lax", // Change from "None" to "Lax" for HTTP
     maxAge: 1000 * 60 * 60 * 24 * 7,
-    domain: undefined // Don't set domain for cross-origin
+    domain: undefined
   }
 }))
 
