@@ -8,11 +8,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+       
       - name: Test SSH connection
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -24,7 +24,7 @@ jobs:
             echo "SSH connection successful!"
             whoami
             pwd
-
+       
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -35,7 +35,7 @@ jobs:
           source: "."
           target: "/var/www/ishopBackend"
           overwrite: true
-
+       
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -43,29 +43,29 @@ jobs:
           username: root
           key: ${{ secrets.DO_SSH_KEY }}
           port: 22
-          envs: NODE_ENV,MONGODB_URI,SESSION_KEY,PORT,FRONT_URL,TOKEN_KEY,EMAIL_SENDER,EMAIL_PASS
+          envs: MONGODB_URI,PORT,SESSION_KEY,FRONT_URL,TOKEN_KEY,EMAIL_SENDER,EMAIL_PASS,NODE_ENV
           script: |
             cd /var/www/ishopBackend
-            # Create .env file from secrets (wrap values in quotes to handle & and special chars)
+            # Create .env file from secrets
             cat > .env << EOF
-NODE_ENV="${NODE_ENV}"
-MONGODB_URI="${MONGODB_URI}"
-SESSION_KEY="${SESSION_KEY}"
-PORT="${PORT}"
-FRONT_URL="${FRONT_URL}"
-TOKEN_KEY="${TOKEN_KEY}"
-EMAIL_SENDER="${EMAIL_SENDER}"
-EMAIL_PASS="${EMAIL_PASS}"
-EOF
+            MONGODB_URI=${MONGODB_URI}
+            PORT=${PORT}
+            SESSION_KEY=${SESSION_KEY}
+            FRONT_URL=${FRONT_URL}
+            TOKEN_KEY=${TOKEN_KEY}
+            EMAIL_SENDER=${EMAIL_SENDER}
+            EMAIL_PASS=${EMAIL_PASS}
+            NODE_ENV=${NODE_ENV}
+            EOF
             docker compose down || true
             docker compose build --no-cache
             docker compose up -d
         env:
-          NODE_ENV: ${{ secrets.NODE_ENV }}
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          SESSION_KEY: ${{ secrets.SESSION_KEY }}
           PORT: ${{ secrets.PORT }}
+          SESSION_KEY: ${{ secrets.SESSION_KEY }}
           FRONT_URL: ${{ secrets.FRONT_URL }}
           TOKEN_KEY: ${{ secrets.TOKEN_KEY }}
           EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
           EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          NODE_ENV: ${{ secrets.NODE_ENV }}
