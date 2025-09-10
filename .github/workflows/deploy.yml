@@ -43,9 +43,21 @@ jobs:
           username: root
           key: ${{ secrets.DO_SSH_KEY }}
           port: 22
+          envs: NODE_ENV,DATABASE_URL,JWT_SECRET,PORT
           script: |
             cd /var/www/ishopBackend
-            ls -la
+            # Create .env file from secrets
+            cat > .env << EOF
+            NODE_ENV=${NODE_ENV}
+            DATABASE_URL=${DATABASE_URL}
+            JWT_SECRET=${JWT_SECRET}
+            PORT=${PORT}
+            EOF
             docker compose down || true
             docker compose build --no-cache
             docker compose up -d
+        env:
+          NODE_ENV: ${{ secrets.NODE_ENV }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          PORT: ${{ secrets.PORT }}
