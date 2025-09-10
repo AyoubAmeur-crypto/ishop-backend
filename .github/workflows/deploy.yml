@@ -43,21 +43,29 @@ jobs:
           username: root
           key: ${{ secrets.DO_SSH_KEY }}
           port: 22
-          envs: NODE_ENV,DATABASE_URL,JWT_SECRET,PORT
+          envs: NODE_ENV,MONGODB_URI,SESSION_KEY,PORT,FRONT_URL,TOKEN_KEY,EMAIL_SENDER,EMAIL_PASS
           script: |
             cd /var/www/ishopBackend
-            # Create .env file from secrets
+            # Create .env file from secrets (wrap values in quotes to handle & and special chars)
             cat > .env << EOF
-            NODE_ENV=${NODE_ENV}
-            DATABASE_URL=${DATABASE_URL}
-            JWT_SECRET=${JWT_SECRET}
-            PORT=${PORT}
-            EOF
+NODE_ENV="${NODE_ENV}"
+MONGODB_URI="${MONGODB_URI}"
+SESSION_KEY="${SESSION_KEY}"
+PORT="${PORT}"
+FRONT_URL="${FRONT_URL}"
+TOKEN_KEY="${TOKEN_KEY}"
+EMAIL_SENDER="${EMAIL_SENDER}"
+EMAIL_PASS="${EMAIL_PASS}"
+EOF
             docker compose down || true
             docker compose build --no-cache
             docker compose up -d
         env:
           NODE_ENV: ${{ secrets.NODE_ENV }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          SESSION_KEY: ${{ secrets.SESSION_KEY }}
           PORT: ${{ secrets.PORT }}
+          FRONT_URL: ${{ secrets.FRONT_URL }}
+          TOKEN_KEY: ${{ secrets.TOKEN_KEY }}
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
