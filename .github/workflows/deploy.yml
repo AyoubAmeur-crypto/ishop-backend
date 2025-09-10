@@ -14,7 +14,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Copy project files to server
+      # Step 2: Debug - Check if secrets exist
+      - name: Debug secrets
+        run: |
+          echo "Host: ${{ secrets.DO_HOST }}"
+          echo "Key exists: ${{ secrets.DO_SSH_KEY != '' }}"
+          echo "Key length: ${#DO_SSH_KEY}"
+        env:
+          DO_SSH_KEY: ${{ secrets.DO_SSH_KEY }}
+
+      # Step 3: Copy project files to server
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -26,6 +35,8 @@ jobs:
           target: "/var/www/ishopBackend"
           overwrite: true
           rm: true
+          debug: true
+          timeout: 30s
 
       # Step 3: Deploy on server via SSH
       - name: Deploy via SSH
@@ -35,6 +46,8 @@ jobs:
           username: root
           key: ${{ secrets.DO_SSH_KEY }}
           port: 22
+          debug: true
+          timeout: 30s
           script: |
             cd /var/www/ishopBackend
             docker compose down
