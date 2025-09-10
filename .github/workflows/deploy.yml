@@ -1,4 +1,4 @@
-name: Deploy iShop Backend
+name: Test Deploy iShop Backend
 
 on:
   push:
@@ -10,20 +10,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repo
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Debug - Check if secrets exist
-      - name: Debug secrets
-        run: |
-          echo "Host: ${{ secrets.DO_HOST }}"
-          echo "Key exists: ${{ secrets.DO_SSH_KEY != '' }}"
-          echo "Key length: ${#DO_SSH_KEY}"
-        env:
-          DO_SSH_KEY: ${{ secrets.DO_SSH_KEY }}
+      - name: Test SSH connection
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: root
+          key: ${{ secrets.DO_SSH_KEY }}
+          port: 22
+          script: |
+            echo "SSH connection successful!"
+            whoami
+            pwd
 
-      # Step 3: Copy project files to server
       - name: Copy files to server
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -34,11 +35,7 @@ jobs:
           source: "."
           target: "/var/www/ishopBackend"
           overwrite: true
-          rm: true
-          debug: true
-          timeout: 30s
 
-      # Step 3: Deploy on server via SSH
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -46,10 +43,9 @@ jobs:
           username: root
           key: ${{ secrets.DO_SSH_KEY }}
           port: 22
-          debug: true
-          timeout: 30s
           script: |
             cd /var/www/ishopBackend
-            docker compose down
+            ls -la
+            docker compose down || true
             docker compose build --no-cache
             docker compose up -d
