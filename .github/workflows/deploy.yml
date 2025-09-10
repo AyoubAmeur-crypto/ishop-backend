@@ -12,25 +12,29 @@ jobs:
     steps:
       # Step 1: Checkout the repo
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Step 2: Copy project files to server
       - name: Copy files to server
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DO_HOST }}
           username: root
           key: ${{ secrets.DO_SSH_KEY }}
+          port: 22
           source: "."
           target: "/var/www/ishopBackend"
+          overwrite: true
+          rm: true
 
       # Step 3: Deploy on server via SSH
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DO_HOST }}
           username: root
           key: ${{ secrets.DO_SSH_KEY }}
+          port: 22
           script: |
             cd /var/www/ishopBackend
             docker compose down
