@@ -24,7 +24,7 @@ app.use(cors({
   origin: process.env.FRONT_URL || "http://localhost:3000",
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }))
 
 // ✅ Fixed Session
@@ -38,9 +38,10 @@ app.use(session({
   }),
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
-    sameSite: "None", // 🔑 allow cross-domain cookie usage
-    maxAge: 1000 * 60 * 60 * 24 * 7
+    secure: true, // Always true for production cross-origin
+    sameSite: "None", // Required for cross-origin
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    domain: undefined // Don't set domain for cross-origin
   }
 }))
 

@@ -48,8 +48,8 @@ exports.logout = async (req,res)=>{
         }
 
          res.clearCookie('token', { path: '/',
-        sameSite: 'lax',
-        secure: false,
+        sameSite: 'None',
+        secure: true,
         });
 
         res.status(200).json({
