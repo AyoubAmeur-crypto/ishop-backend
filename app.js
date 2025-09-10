@@ -21,7 +21,7 @@ app.use(cookieParser())
 
 // ✅ Fixed CORS
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: process.env.FRONT_URL || "http://localhost:3000",
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
@@ -38,7 +38,7 @@ app.use(session({
   }),
   cookie: {
     httpOnly: true,
-    secure: false, // Always true for production cross-origin
+    secure: true, // Always true for production cross-origin
     sameSite: "None", // Required for cross-origin
     maxAge: 1000 * 60 * 60 * 24 * 7,
     domain: undefined // Don't set domain for cross-origin
